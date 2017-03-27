@@ -185,12 +185,12 @@ class SettingsNode {
         if (!node.IsScalar()) {
             throw settings::exception("Settings '" + get_path() + "' is not a scalar value");
         }
-        return node.as<typename basetype<T>::type>();
+        return T(node.as<typename basetype<T>::type>());
     }
 
     template<typename T>
     T as(const typename basetype<T>::type& fallback) const {
-        return node.as<typename basetype<T>::type>(fallback);
+        return T(node.as<typename basetype<T>::type>(fallback));
     }
 
     friend std::ostream& operator<<(std::ostream& os, const SettingsNode& node) {
