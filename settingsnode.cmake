@@ -1,3 +1,7 @@
+if(TARGET settingsnode)
+  return()
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 add_library(settingsnode UNKNOWN IMPORTED)
