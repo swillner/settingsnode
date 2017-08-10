@@ -1,7 +1,11 @@
 #ifndef SETTINGSNODE_H
 #define SETTINGSNODE_H
 
+#ifdef SETTINGSNODE_WITH_YAML
 #include <yaml-cpp/yaml.h>
+#else
+#error Only YAML supported yet. Must set SETTINGSNODE_WITH_YAML.
+#endif
 #include <iostream>
 #include <stdexcept>
 
@@ -14,8 +18,8 @@ class exception : public std::runtime_error {
 
 class hstring {
   protected:
-    const uint32_t hash_;
     const std::string str_;
+    const uint32_t hash_;
 
   public:
     using base_type = std::string;
@@ -32,8 +36,10 @@ class SettingsNode {
         int index;
         std::shared_ptr<Path> parent;
     };
-    std::shared_ptr<Path> path;
+#ifdef SETTINGSNODE_WITH_YAML
     YAML::Node node;
+#endif
+    std::shared_ptr<Path> path;
 
     template<class T, class S = void>
     struct enable_if_type {
@@ -48,7 +54,9 @@ class SettingsNode {
         using type = typename T::base_type;
     };
 
+#ifdef SETTINGSNODE_WITH_YAML
     SettingsNode(const YAML::Node node_p, const std::shared_ptr<Path>& path_p) : node(node_p), path(path_p){};
+#endif
 
     inline void check() const {
         if (empty()) {
@@ -61,9 +69,13 @@ class SettingsNode {
         friend class SettingsNode;
 
       protected:
+#ifdef SETTINGSNODE_WITH_YAML
         const YAML::Node node;
+#endif
         const std::shared_ptr<Path> path;
+#ifdef SETTINGSNODE_WITH_YAML
         Map(const YAML::Node node_p, const std::shared_ptr<Path> path_p) : node(node_p), path(path_p){};
+#endif
 
       public:
         class iterator {
@@ -95,19 +107,27 @@ class SettingsNode {
         friend class SettingsNode;
 
       protected:
+#ifdef SETTINGSNODE_WITH_YAML
         const YAML::Node node;
+#endif
         const std::shared_ptr<Path> path;
+#ifdef SETTINGSNODE_WITH_YAML
         Sequence(const YAML::Node node_p, const std::shared_ptr<Path> path_p) : node(node_p), path(path_p){};
+#endif
 
       public:
         class iterator {
             friend class Sequence;
 
           protected:
+#ifdef SETTINGSNODE_WITH_YAML
             YAML::Node::const_iterator it;
-            int index;
+#endif
             const std::shared_ptr<Path>& path;
+            int index;
+#ifdef SETTINGSNODE_WITH_YAML
             iterator(const YAML::Node::const_iterator it_p, const std::shared_ptr<Path>& path_p) : it(it_p), path(path_p), index(0){};
+#endif
 
           public:
             using iterator_category = std::forward_iterator_tag;
@@ -124,12 +144,18 @@ class SettingsNode {
         iterator end() const { return iterator(node.end(), path); };
     };
 
-    enum class Format { YAML };
+    enum class Format {
+#ifdef SETTINGSNODE_WITH_YAML
+        YAML
+#endif
+    };
 
     SettingsNode() : node() {}
+#ifdef SETTINGSNODE_WITH_YAML
     SettingsNode(std::istream& stream, const Format format = Format::YAML) : node(YAML::Load(stream)) {
         (void)format;  // currently only YAML supported
     }
+#endif
     void operator=(const SettingsNode& rhs) {
         if (rhs.node) {
             node = rhs.node;
