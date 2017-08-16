@@ -19,7 +19,8 @@
 #define SETTINGSNODE_H
 
 #ifdef SETTINGSNODE_WITH_YAML
-#include <yaml-cpp/yaml.h>
+#include <yaml-cpp/node/impl.h>
+#include <yaml-cpp/yaml.h>  // IWYU pragma: keep
 #else
 #error Only YAML supported yet. Must set SETTINGSNODE_WITH_YAML.
 #endif
@@ -241,6 +242,6 @@ class SettingsNode {
         return os;
     }
 };
-}
+}  // namespace settings
 
 #endif
