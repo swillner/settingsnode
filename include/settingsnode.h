@@ -41,10 +41,10 @@ class hstring {
 
   public:
     using base_type = std::string;
-    static constexpr uint32_t hash(const char* str, unsigned int prev = 5381) { return *str ? hash(str + 1, prev * 33 + *str) : prev; };
+    static constexpr uint32_t hash(const char* str, unsigned int prev = 5381) { return *str ? hash(str + 1, prev * 33 + *str) : prev; }
     hstring(const std::string str_p) : str_(str_p), hash_(hash(str_p.c_str())){};
-    operator const uint32_t&() const { return hash_; };
-    operator const std::string&() const { return str_; };
+    operator uint32_t() const { return hash_; }
+    operator const std::string&() const { return str_; }
 };
 
 class SettingsNode {
