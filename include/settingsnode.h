@@ -51,6 +51,7 @@ class SettingsNode;
 
 class Inner {
     friend class SettingsNode;
+    friend std::ostream& operator<<(std::ostream& os, const SettingsNode& node);
 
   protected:
     virtual bool as_bool() const = 0;
@@ -68,6 +69,7 @@ class Inner {
     virtual bool is_map() const = 0;
     virtual bool is_scalar() const = 0;
     virtual bool is_sequence() const = 0;
+    virtual std::ostream& to_stream(std::ostream& os) const = 0;
 
     class map_iterator {
       public:
@@ -109,6 +111,7 @@ class InnerYAML : public Inner {
     inline bool is_map() const override { return node.IsMap(); }
     inline bool is_scalar() const override { return node.IsScalar(); }
     inline bool is_sequence() const override { return node.IsSequence(); }
+    inline std::ostream& to_stream(std::ostream& os) const override { return os << node; }
 
     class map_iterator : public Inner::map_iterator {
         friend class InnerYAML;
@@ -214,7 +217,6 @@ class SettingsNode {
             iterator(Inner::map_iterator* const it_p, const std::shared_ptr<Path>& path_p) : it(it_p), path(path_p){};
 
           public:
-            // TODO using iterator_category = std::forward_iterator_tag;
             void operator++() { it->next(); }
             std::pair<std::string, SettingsNode> operator*() const {
                 const std::string& name = it->name();
@@ -248,7 +250,6 @@ class SettingsNode {
             iterator(Inner::sequence_iterator* const it_p, const std::shared_ptr<Path>& path_p) : it(it_p), path(path_p){};
 
           public:
-            // TODO using iterator_category = std::forward_iterator_tag;
             void operator++() {
                 ++index;
                 it->next();
@@ -352,6 +353,8 @@ class SettingsNode {
         }
         path = rhs.path;
     }
+
+    inline friend std::ostream& operator<<(std::ostream& os, const SettingsNode& node) { return node.inner->to_stream(os); }
 };
 
 template<>
