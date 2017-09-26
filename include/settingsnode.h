@@ -56,6 +56,7 @@ class Inner {
   protected:
     virtual bool as_bool() const = 0;
     virtual int as_int() const = 0;
+    virtual int as_uint() const = 0;
     virtual std::size_t as_size_t() const = 0;
     virtual double as_double() const = 0;
     virtual float as_float() const { return as_double(); }
@@ -98,6 +99,7 @@ class InnerYAML : public Inner {
     explicit InnerYAML(const YAML::Node node_p) : node(node_p){};
     inline bool as_bool() const override { return node.as<bool>(); }
     inline int as_int() const override { return node.as<int>(); }
+    inline int as_uint() const override { return node.as<unsigned int>(); }
     inline std::size_t as_size_t() const override { return node.as<std::size_t>(); }
     inline double as_double() const override { return node.as<double>(); }
     inline float as_float() const override { return node.as<float>(); }
@@ -369,6 +371,13 @@ inline int SettingsNode::as_inner<int>() const {
     check();
     check_scalar();
     return inner->as_int();
+}
+
+template<>
+inline unsigned int SettingsNode::as_inner<unsigned int>() const {
+    check();
+    check_scalar();
+    return inner->as_uint();
 }
 
 template<>
