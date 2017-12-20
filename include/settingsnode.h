@@ -280,6 +280,8 @@ class SettingsNode {
 
     inline bool empty() const { return !inner || inner->empty(); }
     inline bool is_scalar() const { return inner && inner->is_scalar(); }
+    inline bool is_sequence() const { return inner && inner->is_sequence(); }
+    inline bool is_map() const { return inner && inner->is_map(); }
     inline bool has(const char* key) const { return inner && inner->has(key); }
     inline bool has(const std::string& key) const { return inner && inner->has(key); }
 
