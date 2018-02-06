@@ -41,7 +41,7 @@ class hstring {
   protected:
     const base_type str_m;
     const hash_type hash_m;
-    constexpr hstring(const base_type& str_p, hash_type hash_p) : str_m(str_p), hash_m(hash_p){};
+    hstring(const base_type& str_p, hash_type hash_p) : str_m(str_p), hash_m(hash_p){};
 
   public:
     static constexpr hash_type hash(const char* str, hash_type prev = 5381) { return *str ? hash(str + 1, prev * 33 + *str) : prev; }
