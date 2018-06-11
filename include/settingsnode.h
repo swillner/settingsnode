@@ -243,6 +243,78 @@ class SettingsNode {
         path = rhs.path;
     }
 
+    void json(std::ostream& os, std::string indent = "", bool first = true) const {
+        if (first) {
+            os << indent;
+        }
+        if (is_sequence()) {
+            os << "[\n";
+            bool noindent = true;
+            for (const auto& i : as_sequence()) {
+                if (noindent) {
+                    noindent = false;
+                } else {
+                    os << ",\n";
+                }
+                os << indent << "  ";
+                i.json(os, indent + "  ", false);
+            }
+            os << "\n" << indent << "]";
+        } else if (is_map()) {
+            os << "{\n";
+            bool noindent = true;
+            for (const auto& i : as_map()) {
+                if (noindent) {
+                    noindent = false;
+                } else {
+                    os << ",\n";
+                }
+                os << indent << "  \"" << i.first << "\": ";
+                i.second.json(os, indent + "  ", false);
+            }
+            os << "\n" << indent << "}";
+        } else {
+            os << "\"" << as<std::string>() << "\"";
+        }
+        if (first) {
+            os << "\n";
+        }
+    }
+
+    void yaml(std::ostream& os, std::string indent = "", bool first = true) const {
+        if (first) {
+            os << indent;
+        }
+        if (is_sequence()) {
+            bool noindent = true;
+            for (const auto& i : as_sequence()) {
+                if (noindent) {
+                    noindent = false;
+                } else {
+                    os << "\n" << indent;
+                }
+                os << "- ";
+                i.yaml(os, indent + "  ", false);
+            }
+        } else if (is_map()) {
+            bool noindent = true;
+            for (const auto& i : as_map()) {
+                if (noindent) {
+                    noindent = false;
+                } else {
+                    os << "\n" << indent;
+                }
+                os << "\"" << i.first << "\": ";
+                i.second.yaml(os, indent + "  ", false);
+            }
+        } else {
+            os << "\"" << as<std::string>() << "\"";
+        }
+        if (first) {
+            os << "\n";
+        }
+    }
+
     inline friend std::ostream& operator<<(std::ostream& os, const SettingsNode& node) { return node.inner->to_stream(os); }
 };
 
