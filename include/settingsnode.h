@@ -48,9 +48,9 @@ class hstring {
     static constexpr hash_type hash(const char* str, hash_type prev = 5381) { return *str != '\0' ? hash(str + 1, prev * 33 + *str) : prev; }
     static hstring null() { return hstring("", 0); }
     explicit hstring(const base_type& str_p) : str_m(str_p), hash_m(hash(str_p.c_str())){};
-    constexpr operator hash_type() const { return hash_m; }        // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
-    constexpr operator const base_type&() const { return str_m; }  // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
-    constexpr hash_type operator^(hash_type other) const { return hash_m * 5381 * 5381 + other; }
+    inline operator hash_type() const { return hash_m; }        // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    inline operator const base_type&() const { return str_m; }  // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    inline hash_type operator^(hash_type other) const { return hash_m * 5381 * 5381 + other; }
     friend std::ostream& operator<<(std::ostream& lhs, const hstring& rhs) { return lhs << rhs.str_m; }
 };
 
