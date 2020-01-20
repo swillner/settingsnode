@@ -20,6 +20,7 @@
 
 #include <yaml-cpp/node/impl.h>
 #include <yaml-cpp/yaml.h>  // IWYU pragma: keep
+
 #include "settingsnode/inner.h"
 
 namespace settings {
@@ -60,7 +61,10 @@ class YAML : public Inner {
         void next() override { ++it; }
         std::string name() const override { return (*it).first.as<std::string>(); }
         Inner* value() const override { return new YAML((*it).second); }
-        bool equals(const Inner::map_iterator* rhs) const override { return it == dynamic_cast<const map_iterator*>(rhs)->it; }
+        bool equals(const Inner::map_iterator* rhs) const override {
+            // rhs must be of type map_iterator*
+            return it == static_cast<const map_iterator*>(rhs)->it;  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+        }
     };
 
     std::pair<Inner::map_iterator*, Inner::map_iterator*> as_map() const override {
@@ -77,7 +81,10 @@ class YAML : public Inner {
       public:
         void next() override { ++it; }
         Inner* value() const override { return new YAML(*it); }
-        bool equals(const Inner::sequence_iterator* rhs) const override { return it == dynamic_cast<const sequence_iterator*>(rhs)->it; }
+        bool equals(const Inner::sequence_iterator* rhs) const override {
+            // rhs must be of type map_iterator*
+            return it == static_cast<const sequence_iterator*>(rhs)->it;  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+        }
     };
 
     std::pair<Inner::sequence_iterator*, Inner::sequence_iterator*> as_sequence() const override {
