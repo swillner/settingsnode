@@ -55,7 +55,7 @@ class YAML : public Inner {
 
       protected:
         YAMLlib::Node::const_iterator it;
-        explicit map_iterator(YAMLlib::Node::const_iterator it_p) : it(std::move(it_p)){};
+        explicit map_iterator(YAMLlib::Node::const_iterator it_p) : it(std::move(it_p)) {}
 
       public:
         void next() override { ++it; }
@@ -76,7 +76,7 @@ class YAML : public Inner {
 
       protected:
         YAMLlib::Node::const_iterator it;
-        explicit sequence_iterator(YAMLlib::Node::const_iterator it_p) : it(std::move(it_p)){};
+        explicit sequence_iterator(YAMLlib::Node::const_iterator it_p) : it(std::move(it_p)) {}
 
       public:
         void next() override { ++it; }

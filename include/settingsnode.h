@@ -25,13 +25,14 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+
 #include "settingsnode/inner.h"
 
 namespace settings {
 
 class exception : public std::runtime_error {
   public:
-    explicit exception(const std::string& s) : std::runtime_error(s){};
+    explicit exception(const std::string& s) : std::runtime_error(s) {}
 };
 
 class hstring {
@@ -42,12 +43,12 @@ class hstring {
   protected:
     const base_type str_m;
     const hash_type hash_m;
-    hstring(base_type str_p, hash_type hash_p) : str_m(std::move(str_p)), hash_m(hash_p){};
+    hstring(base_type str_p, hash_type hash_p) : str_m(std::move(str_p)), hash_m(hash_p) {}
 
   public:
     static constexpr hash_type hash(const char* str, hash_type prev = 5381) { return *str != '\0' ? hash(str + 1, prev * 33 + *str) : prev; }
     static hstring null() { return hstring("", 0); }
-    explicit hstring(const base_type& str_p) : str_m(str_p), hash_m(hash(str_p.c_str())){};
+    explicit hstring(const base_type& str_p) : str_m(str_p), hash_m(hash(str_p.c_str())) {}
     inline operator hash_type() const { return hash_m; }        // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     inline operator const base_type&() const { return str_m; }  // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     inline hash_type operator^(hash_type other) const { return hash_m * 5381 * 5381 + other; }
@@ -63,7 +64,7 @@ class SettingsNode {
     };
     std::shared_ptr<Path> path;
     std::shared_ptr<Inner> inner;
-    SettingsNode(Inner* inner_p, std::shared_ptr<Path> path_p) : inner(inner_p), path(std::move(path_p)){};
+    SettingsNode(Inner* inner_p, std::shared_ptr<Path> path_p) : inner(inner_p), path(std::move(path_p)) {}
 
     template<class T, class S = void>
     struct enable_if_type {
@@ -109,7 +110,7 @@ class SettingsNode {
         const std::shared_ptr<Path> path;
         std::unique_ptr<Inner::map_iterator> begin_m;
         std::unique_ptr<Inner::map_iterator> end_m;
-        Map(Inner::map_iterator* begin_p, Inner::map_iterator* end_p, std::shared_ptr<Path> path_p) : begin_m(begin_p), end_m(end_p), path(std::move(path_p)){};
+        Map(Inner::map_iterator* begin_p, Inner::map_iterator* end_p, std::shared_ptr<Path> path_p) : begin_m(begin_p), end_m(end_p), path(std::move(path_p)) {}
 
       public:
         class iterator {
@@ -118,7 +119,7 @@ class SettingsNode {
           protected:
             const std::shared_ptr<Path>& path;
             Inner::map_iterator* const it;
-            iterator(Inner::map_iterator* const it_p, const std::shared_ptr<Path>& path_p) : it(it_p), path(path_p){};
+            iterator(Inner::map_iterator* const it_p, const std::shared_ptr<Path>& path_p) : it(it_p), path(path_p) {}
 
           public:
             void operator++() { it->next(); }
@@ -141,7 +142,7 @@ class SettingsNode {
         std::unique_ptr<Inner::sequence_iterator> begin_m;
         std::unique_ptr<Inner::sequence_iterator> end_m;
         Sequence(Inner::sequence_iterator* begin_p, Inner::sequence_iterator* end_p, std::shared_ptr<Path> path_p)
-            : begin_m(begin_p), end_m(end_p), path(std::move(path_p)){};
+            : begin_m(begin_p), end_m(end_p), path(std::move(path_p)) {}
 
       public:
         class iterator {
@@ -151,7 +152,7 @@ class SettingsNode {
             const std::shared_ptr<Path>& path;
             Inner::sequence_iterator* const it;
             int index = 0;
-            iterator(Inner::sequence_iterator* const it_p, const std::shared_ptr<Path>& path_p) : it(it_p), path(path_p){};
+            iterator(Inner::sequence_iterator* const it_p, const std::shared_ptr<Path>& path_p) : it(it_p), path(path_p) {}
 
           public:
             void operator++() {

@@ -19,6 +19,7 @@
 #define SETTINGSNODE_PYBIND_H
 
 #include <pybind11/pytypes.h>
+
 #include "settingsnode/inner.h"
 
 namespace settings {
@@ -54,7 +55,7 @@ class PyNode : public Inner {
 
       protected:
         inner_iterator it;
-        explicit map_iterator(inner_iterator it_p) : it(std::move(it_p)){};
+        explicit map_iterator(inner_iterator it_p) : it(std::move(it_p)) {}
 
       public:
         void next() override { ++it; }
@@ -73,7 +74,7 @@ class PyNode : public Inner {
 
       protected:
         inner_iterator it;
-        explicit sequence_iterator(inner_iterator it_p) : it(std::move(it_p)){};
+        explicit sequence_iterator(inner_iterator it_p) : it(std::move(it_p)) {}
 
       public:
         void next() override { ++it; }
@@ -87,7 +88,7 @@ class PyNode : public Inner {
     }
 
   public:
-    explicit PyNode(py::object node_p) : node(std::move(node_p)){};
+    explicit PyNode(py::object node_p) : node(std::move(node_p)) {}
 };
 
 }  // namespace settings
