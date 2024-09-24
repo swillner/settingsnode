@@ -43,8 +43,8 @@ class YAML : public Inner {
     inline Inner* get(const char* key) const override { return new YAML{node[key]}; }
     inline Inner* get(const std::string& key) const override { return new YAML{node[key]}; }
     inline bool empty() const override { return !node; }
-    inline bool has(const char* key) const override { return node[key] != nullptr; }
-    inline bool has(const std::string& key) const override { return node[key] != nullptr; }
+    inline bool has(const char* key) const override { return node[key].IsDefined(); }
+    inline bool has(const std::string& key) const override { return node[key].IsDefined(); }
     inline bool is_map() const override { return node.IsMap(); }
     inline bool is_scalar() const override { return node.IsScalar(); }
     inline bool is_sequence() const override { return node.IsSequence(); }
