@@ -60,7 +60,7 @@ class PyNode : public Inner {
       public:
         void next() override { ++it; }
         std::string name() const override { return py::str((*it).first).cast<std::string>(); }
-        Inner* value() const override { return new PyNode(py::reinterpret_steal<py::object>((*it).second)); }
+        Inner* value() const override { return new PyNode(py::reinterpret_borrow<py::object>((*it).second)); }
         bool equals(const Inner::map_iterator* rhs) const override { return it == static_cast<const map_iterator*>(rhs)->it; }
     };
 
@@ -78,7 +78,7 @@ class PyNode : public Inner {
 
       public:
         void next() override { ++it; }
-        Inner* value() const override { return new PyNode(py::reinterpret_steal<py::object>(*it)); }
+        Inner* value() const override { return new PyNode(py::reinterpret_borrow<py::object>(*it)); }
         bool equals(const Inner::sequence_iterator* rhs) const override { return it == static_cast<const sequence_iterator*>(rhs)->it; }
     };
 

@@ -19,10 +19,16 @@
 #define SETTINGSNODE_H
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <unordered_map>
 #include <vector>
 
@@ -91,6 +97,42 @@ class SettingsNode {
         }
     }
 
+    static std::string escape_string(const std::string& value) {
+        std::ostringstream result;
+        for (const unsigned char ch : value) {
+            switch (ch) {
+                case '"':
+                    result << "\\\"";
+                    break;
+                case '\\':
+                    result << "\\\\";
+                    break;
+                case '\b':
+                    result << "\\b";
+                    break;
+                case '\f':
+                    result << "\\f";
+                    break;
+                case '\n':
+                    result << "\\n";
+                    break;
+                case '\r':
+                    result << "\\r";
+                    break;
+                case '\t':
+                    result << "\\t";
+                    break;
+                default:
+                    if (ch < 0x20) {
+                        result << "\\u" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(ch);
+                    } else {
+                        result << ch;
+                    }
+            }
+        }
+        return result.str();
+    }
+
     template<typename T>
     T as_inner() const;
 
@@ -122,7 +164,10 @@ class SettingsNode {
             iterator(Inner::map_iterator* const it_p, const std::shared_ptr<Path>& path_p) : it(it_p), path(path_p) {}
 
           public:
-            void operator++() { it->next(); }
+            iterator& operator++() {
+                it->next();
+                return *this;
+            }
             std::pair<std::string, SettingsNode> operator*() const {
                 const std::string& name = it->name();
                 return std::make_pair(name, SettingsNode(it->value(), std::make_shared<Path>(Path{name, -1, path})));
@@ -155,9 +200,10 @@ class SettingsNode {
             iterator(Inner::sequence_iterator* const it_p, const std::shared_ptr<Path>& path_p) : it(it_p), path(path_p) {}
 
           public:
-            void operator++() {
+            iterator& operator++() {
                 ++index;
                 it->next();
+                return *this;
             }
             SettingsNode operator*() const { return SettingsNode(it->value(), std::make_shared<Path>(Path{"", index, path})); }
             bool operator==(const iterator& rhs) const { return it->equals(rhs.it); }
@@ -293,12 +339,12 @@ class SettingsNode {
                 } else {
                     os << ",\n";
                 }
-                os << indent << "  \"" << i.first << "\": ";
+                os << indent << "  \"" << escape_string(i.first) << "\": ";
                 i.second.json(os, indent + "  ", false);
             }
             os << "\n" << indent << "}";
         } else {
-            os << "\"" << as<std::string>() << "\"";
+            os << "\"" << escape_string(as<std::string>()) << "\"";
         }
         if (first) {
             os << "\n";
@@ -328,18 +374,21 @@ class SettingsNode {
                 } else {
                     os << "\n" << indent;
                 }
-                os << "\"" << i.first << "\": ";
+                os << "\"" << escape_string(i.first) << "\": ";
                 i.second.yaml(os, indent + "  ", false);
             }
         } else {
-            os << "\"" << as<std::string>() << "\"";
+            os << "\"" << escape_string(as<std::string>()) << "\"";
         }
         if (first) {
             os << "\n";
         }
     }
 
-    inline friend std::ostream& operator<<(std::ostream& os, const SettingsNode& node) { return node.inner->to_stream(os); }
+    inline friend std::ostream& operator<<(std::ostream& os, const SettingsNode& node) {
+        node.check();
+        return node.inner->to_stream(os);
+    }
 };
 
 template<>
@@ -396,19 +445,19 @@ inline std::string SettingsNode::as_inner<std::string>() const {
 template<>
 struct std::iterator_traits<settings::SettingsNode::Map::iterator> {
     using value_type = std::pair<std::string, settings::SettingsNode>;
-    using difference_type = void;
+    using difference_type = std::ptrdiff_t;
     using pointer = void;
     using reference = std::pair<std::string, settings::SettingsNode>;
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::input_iterator_tag;
 };
 
 template<>
 struct std::iterator_traits<settings::SettingsNode::Sequence::iterator> {
     using value_type = settings::SettingsNode;
-    using difference_type = void;
+    using difference_type = std::ptrdiff_t;
     using pointer = void;
     using reference = settings::SettingsNode;
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::input_iterator_tag;
 };
 
 #endif

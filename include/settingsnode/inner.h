@@ -19,6 +19,8 @@
 #define SETTINGSNODE_INNER_H
 
 #include <iostream>
+#include <string>
+#include <utility>
 
 namespace settings {
 
